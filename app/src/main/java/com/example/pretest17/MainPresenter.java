@@ -20,11 +20,11 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void getUsersData() {
-        mUsersDataSource.getUsers("tom", 1, new Response.Listener<GithubData>() {
+    public void getUsersData(@NonNull String query) {
+        mUsersDataSource.getUsers(query, 1, new Response.Listener<GithubData>() {
             @Override
             public void onResponse(GithubData response) {
-                Log.e("VolleyTest",response.getItems().size()+","+response.getTotalCount());
+
             }
         }, new Response.ErrorListener() {
             @Override
