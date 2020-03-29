@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.pretest17.data.UsersRepository;
 import com.example.pretest17.data.module.User;
@@ -32,13 +33,15 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mMainPresenter.getUsersData(query);
+                mUserCardAdapter.setStatusLoading();
+                mMainPresenter.newSearchUsers(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mMainPresenter.getUsersData(newText);
+                mUserCardAdapter.setStatusLoading();
+                mMainPresenter.newSearchUsers(newText);
                 return false;
             }
         });
@@ -51,8 +54,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         RecyclerView recyclerView = findViewById(R.id.recycler_main);
 
         // build & set Adapter
-        mUserCardAdapter = new UserCardAdapter();
+        mUserCardAdapter = new UserCardAdapter(getString(R.string.no_result_empty));
         recyclerView.setAdapter(mUserCardAdapter);
+        mUserCardAdapter.setOnItemClickListener(new UserCardAdapter.OnItemClickListener() {
+            @Override
+            public void onBtnRetryClick() {
+                Log.e("test","1");
+            }
+        });
 
         // build & set LayoutManager
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
@@ -67,17 +76,32 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void showUserCards(@NonNull List<User> userList, boolean isUserListEnd) {
-        
+    public void newUserCards(@NonNull List<User> userList, int totalCount) {
+        mUserCardAdapter.newStatusCards(userList, totalCount);
     }
 
     @Override
-    public void showError(@NonNull String hint) {
-
+    public void updateUserCards(@NonNull List<User> userList) {
+        mUserCardAdapter.updateStatusCards(userList);
     }
 
     @Override
-    public void showNoReuslt(@NonNull String hint) {
+    public void forceUserCardsEnd() {
+        mUserCardAdapter.forceStatusCardsEnd();
+    }
 
+    @Override
+    public void showError(int stringId) {
+        mUserCardAdapter.setStatusError(getString(stringId));
+    }
+
+    @Override
+    public void showNoResult(int stringId) {
+        mUserCardAdapter.setStatusNoResult(getString(stringId));
+    }
+
+    @Override
+    public void showAlert(int stringId) {
+        // FIXME
     }
 }

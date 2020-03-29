@@ -1,6 +1,5 @@
 package com.example.pretest17;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,44 +16,47 @@ import com.example.pretest17.data.module.User;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+
 public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<User> mUserList = new ArrayList<>();
-    private boolean isUserListEnd = false;
+    private int totalCount;
 
     private int status;
     private final int VIEW_TYPE_CARDS = 0, VIEW_TYPE_LOADING = 1, VIEW_TYPE_NO_RESULT = 2, VIEW_TYPE_ERROR = 3;
-    //FIXME
-    private String hint = "test";
+    private String hint;
 
     private class UserCardViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView imgAvatar;
+        private ImageView imgAvatar,imgPlaceHolder;
         private TextView textName;
 
         UserCardViewHolder(@NonNull View itemView) {
             super(itemView);
             imgAvatar = itemView.findViewById(R.id.img_card_user_avatar);
             textName = itemView.findViewById(R.id.text_card_user_name);
+            imgPlaceHolder = itemView.findViewById(R.id.img_card_user_placeholder);
         }
     }
 
     private class HintViewHolder extends RecyclerView.ViewHolder {
 
+        private ImageView imgHint;
+        private TextView textHint;
+        private Button btnRetry;
+
         HintViewHolder(@NonNull View itemView) {
             super(itemView);
-            ImageView imgHint = itemView.findViewById(R.id.img_card_hint);
-            TextView textHint = itemView.findViewById(R.id.text_card_hint);
-            Button btnRetry = itemView.findViewById(R.id.btn_card_hint_retry);
-
-            textHint.setText(hint);
-            if (status == VIEW_TYPE_NO_RESULT) {
-                imgHint.setImageDrawable(itemView.getContext().getDrawable(R.drawable.ic_no_search));
-                btnRetry.setVisibility(View.GONE);
-            } else {
-                imgHint.setImageDrawable(itemView.getContext().getDrawable(R.drawable.ic_error));
-                btnRetry.setVisibility(View.VISIBLE);
-            }
+            imgHint = itemView.findViewById(R.id.img_card_hint);
+            textHint = itemView.findViewById(R.id.text_card_hint);
+            btnRetry = itemView.findViewById(R.id.btn_card_hint_retry);
+            btnRetry.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onItemClickListener.onBtnRetryClick();
+                }
+            });
         }
     }
 
@@ -69,8 +71,9 @@ public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    UserCardAdapter() {
-        status = VIEW_TYPE_LOADING;
+    UserCardAdapter(String hint) {
+        status = VIEW_TYPE_NO_RESULT;
+        this.hint = hint;
     }
 
     @NonNull
@@ -79,7 +82,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         switch (viewType) {
             case VIEW_TYPE_CARDS:
                 return new UserCardViewHolder(LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.card_loading, parent, false));
+                        .inflate(R.layout.card_user, parent, false));
             case VIEW_TYPE_NO_RESULT:
             case VIEW_TYPE_ERROR:
                 return new HintViewHolder(LayoutInflater.from(parent.getContext())
@@ -93,14 +96,47 @@ public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if(holder instanceof HintViewHolder){
+            setHintView((HintViewHolder) holder);
+        } else if(holder instanceof UserCardViewHolder){
+            setUserCardView((UserCardViewHolder) holder, position);
+        }
+    }
 
+    private void setHintView(HintViewHolder holder){
+        holder.textHint.setText(hint);
+        if (status == VIEW_TYPE_NO_RESULT) {
+            holder.imgHint.setImageDrawable(holder.itemView.getContext().getDrawable(R.drawable.ic_no_search));
+            holder.btnRetry.setVisibility(View.GONE);
+        } else {
+            holder.imgHint.setImageDrawable(holder.itemView.getContext().getDrawable(R.drawable.ic_error));
+            holder.btnRetry.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setUserCardView(UserCardViewHolder holder, int position){
+        User user = mUserList.get(position);
+        if(user!=null){
+            Glide.with(holder.itemView.getContext())
+                    .load(user.getAvatar())
+                    .transition(withCrossFade())
+                    .centerCrop()
+                    .circleCrop()
+                    .into(holder.imgAvatar);
+            holder.textName.setText(user.getName());
+            if(user.getCardType()==User.CARD_TYPE_3_3){
+                holder.imgPlaceHolder.setVisibility(View.VISIBLE);
+            }else {
+                holder.imgPlaceHolder.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
         if (mUserList.isEmpty()) {
             return status;
-        } else if (position > mUserList.size()) {
+        } else if (position >= mUserList.size()) {
             return VIEW_TYPE_LOADING;
         } else {
             return VIEW_TYPE_CARDS;
@@ -129,36 +165,53 @@ public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         onItemClickListener = listener;
     }
 
-    private void setStatus(int status, @NonNull String hint) {
-        this.status = status;
-        this.hint = hint;
-    }
-
     void setStatusError(@NonNull String hint) {
+        clearUserList();
         setStatus(VIEW_TYPE_ERROR, hint);
     }
 
     void setStatusNoResult(@NonNull String hint) {
+        clearUserList();
         setStatus(VIEW_TYPE_NO_RESULT, hint);
     }
 
     void setStatusLoading() {
+        clearUserList();
         setStatus(VIEW_TYPE_LOADING, "");
     }
 
-    void setStatusCards(@NonNull List<User> newUserList, boolean isUserListEnd) {
+    void updateStatusCards(@NonNull List<User> newUserList){
+        updateUserList(newUserList, -1);
         setStatus(VIEW_TYPE_CARDS, "");
-        updateUserList(newUserList, isUserListEnd);
     }
 
-    private void updateUserList(@NonNull List<User> newUserList, boolean isUserListEnd) {
+    void newStatusCards(@NonNull List<User> newUserList, int totalCount) {
+        clearUserList();
+        updateUserList(newUserList, totalCount);
+        setStatus(VIEW_TYPE_CARDS, "");
+    }
+
+    void forceStatusCardsEnd(){
+        this.totalCount = mUserList.size();
+    }
+
+    private void clearUserList(){
         mUserList.clear();
+    }
+
+    private void updateUserList(@NonNull List<User> newUserList, int totalCount) {
         mUserList.addAll(newUserList);
-        this.isUserListEnd = isUserListEnd;
+        this.totalCount = totalCount==-1 ? this.totalCount : totalCount;
+    }
+
+    private void setStatus(int status, @NonNull String hint) {
+        this.status = status;
+        this.hint = hint;
+        notifyDataSetChanged();
     }
 
     int getSpanCount(int position) {
-        if (status != VIEW_TYPE_CARDS || position > mUserList.size()) {
+        if (status != VIEW_TYPE_CARDS || position >= mUserList.size()) {
             return 2;
         } else {
             return mUserList.get(position).getSpanCount();

@@ -9,6 +9,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.example.pretest17.data.module.GithubData;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * You only ask the app should have remote data,
  * so I simplify the UsersLocalRepository and UsersRemoteRepository into UsersRepository.
@@ -41,8 +44,16 @@ public class UsersRepository implements UsersDataSource {
 
     @Override
     public void getUsers(@NonNull String query, int page, @NonNull Response.Listener<GithubData> onSuccessResponse, @NonNull Response.ErrorListener onErrorResponse) {
-        String url = "https://api.github.com/search/users?q="+query+"m&per_page=20&page="+page;
-        GsonRequest gsonRequest = new GsonRequest<>(Request.Method.GET, url, GithubData.class, null, null, onSuccessResponse, onErrorResponse);
+        String url = "https://api.github.com/search/users?q="+query+"&per_page=20&page="+page;
+        GsonRequest gsonRequest = new GsonRequest<>(Request.Method.GET, url, GithubData.class, buildHeader(), null, onSuccessResponse, onErrorResponse);
         mRequestQueue.add(gsonRequest);
+    }
+
+    private Map<String, String> buildHeader() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Accept", "application/json");
+        headers.put("Content-Type", "application/json; charset=UTF-8");
+        headers.put("user", "17pretest" );
+        return headers;
     }
 }

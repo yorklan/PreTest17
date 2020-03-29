@@ -4,7 +4,10 @@
     <string name="detail_total_views">Total Views</string>
     <string name="error_network">Network Error, Please check your network connection and retry later.</string>
     <string name="error_server">Server Error, Please retry later.</string>
+    <string name="error_limited">You searched more than 5,000 times in an hour. Please try again later.</string>
+    <string name="error_update">Unable to update data.</string>
     <string name="error_retry">Retry</string>
-    <string name="error_no_result">No Result</string>
+    <string name="no_result_empty">Please Enter Keywords</string>
+    <string name="no_result_query">No Result</string>
     <string name="hint_leave">press again to exit</string>
 </resources>

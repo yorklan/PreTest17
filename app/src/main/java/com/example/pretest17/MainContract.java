@@ -10,16 +10,24 @@ public interface MainContract {
 
     interface View {
 
-        void showUserCards(@NonNull List<User> userList, boolean isUserListEnd);
+        void newUserCards(@NonNull List<User> userList, int totalCount);
 
-        void showError(@NonNull String hint);
+        void updateUserCards(@NonNull List<User> userList);
 
-        void showNoReuslt(@NonNull String hint);
+        void forceUserCardsEnd();
+
+        void showError(int stringId);
+
+        void showNoResult(int stringId);
+
+        void showAlert(int stringId);
 
     }
 
     interface Presenter {
 
-        void getUsersData(@NonNull String query);
+        void newSearchUsers(@NonNull String query);
+
+        void continueSearchUsers();
     }
 }
