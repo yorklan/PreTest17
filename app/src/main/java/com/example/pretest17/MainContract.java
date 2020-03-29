@@ -8,5 +8,6 @@ public interface MainContract {
 
     interface Presenter {
 
+        void getUsersData();
     }
 }
