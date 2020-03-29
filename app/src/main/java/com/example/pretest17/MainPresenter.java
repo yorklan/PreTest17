@@ -1,5 +1,7 @@
 package com.example.pretest17;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.android.volley.NetworkError;
@@ -16,6 +18,8 @@ public class MainPresenter implements MainContract.Presenter {
 
     private UsersDataSource mUsersDataSource;
     private MainContract.View mMainView;
+
+    private boolean isUpdateLock;
     private int pageIndex;
     private String lastQuery;
 
@@ -26,6 +30,7 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     private void initSearchParams() {
+        isUpdateLock = false;
         pageIndex = 1;
         lastQuery = "";
     }
@@ -36,6 +41,7 @@ public class MainPresenter implements MainContract.Presenter {
         if(query.isEmpty()){
             mMainView.showNoResult(R.string.no_result_empty);
         }else {
+            lastQuery = query;
             getNewUserData(query);
         }
     }
@@ -48,17 +54,6 @@ public class MainPresenter implements MainContract.Presenter {
                 if(userList == null || userList.isEmpty()){
                     mMainView.showNoResult(R.string.no_result_query);
                 }else {
-                    for (int i=0; i<userList.size(); i++){
-                        User user = userList.get(i);
-                        if(user.getCardType()==User.CARD_TYPE_1_1){
-                            continue;
-                        }
-                        int random = (int)(Math.random()*3);
-                        user.setCardType(random);
-                        if(random==User.CARD_TYPE_1_1 && i+1 < userList.size()){
-                            userList.get(i+1).setCardType(User.CARD_TYPE_1_1);
-                        }
-                    }
                     mMainView.newUserCards(response.getItems(), response.getTotalCount());
                 }
 
@@ -78,10 +73,18 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void continueSearchUsers() {
+    public void updateSearchUsers(boolean isSearch) {
+        if(isSearch && !isUpdateLock){
+            getUpdateUserData();
+        }
+    }
+
+    private void getUpdateUserData(){
+        isUpdateLock = true;
         mUsersDataSource.getUsers(lastQuery, ++pageIndex, new Response.Listener<GithubData>() {
             @Override
             public void onResponse(GithubData response) {
+                isUpdateLock = false;
                 if(response.getItems() == null || response.getItems().isEmpty()){
                     mMainView.forceUserCardsEnd();
                 }else {
@@ -91,6 +94,7 @@ public class MainPresenter implements MainContract.Presenter {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                isUpdateLock = false;
                 if(error instanceof NetworkError){
                     mMainView.showAlert(R.string.error_network);
                 }else {

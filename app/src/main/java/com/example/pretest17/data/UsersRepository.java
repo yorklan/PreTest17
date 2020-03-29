@@ -53,7 +53,6 @@ public class UsersRepository implements UsersDataSource {
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept", "application/json");
         headers.put("Content-Type", "application/json; charset=UTF-8");
-        headers.put("user", "17pretest" );
         return headers;
     }
 }

@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.example.pretest17.data.UsersRepository;
 import com.example.pretest17.data.module.User;
@@ -38,14 +37,23 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 return false;
             }
 
+            /**
+             * I am not sure what kind of the search experience that you actually want,
+             * so I disable this function.
+             * The reason is if I do this the unregistered user will easily out of the api limit.
+             */
             @Override
             public boolean onQueryTextChange(String newText) {
-                mUserCardAdapter.setStatusLoading();
-                mMainPresenter.newSearchUsers(newText);
+
+                //mUserCardAdapter.setStatusLoading();
+                //mMainPresenter.newSearchUsers(newText);
+                if(newText.isEmpty()){
+                    mMainPresenter.newSearchUsers("");
+                }
                 return false;
             }
         });
-        searchView.setSubmitButtonEnabled(false);
+        searchView.setSubmitButtonEnabled(true);
         searchView.setIconified(false);
         searchView.clearFocus();
     }
@@ -56,15 +64,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         // build & set Adapter
         mUserCardAdapter = new UserCardAdapter(getString(R.string.no_result_empty));
         recyclerView.setAdapter(mUserCardAdapter);
-        mUserCardAdapter.setOnItemClickListener(new UserCardAdapter.OnItemClickListener() {
-            @Override
-            public void onBtnRetryClick() {
-                Log.e("test","1");
-            }
-        });
 
         // build & set LayoutManager
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
+        final GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
         gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -73,6 +75,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             }
         });
         recyclerView.setLayoutManager(gridLayoutManager);
+
+        // pagination
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int lastVisibleItem = gridLayoutManager.findLastVisibleItemPosition();
+                int totalItemCount = gridLayoutManager.getItemCount();
+                mMainPresenter.updateSearchUsers(lastVisibleItem >= totalItemCount - 10 && dy > 0 && mUserCardAdapter.isDataUpdate());
+            }
+        });
     }
 
     @Override
@@ -102,6 +115,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void showAlert(int stringId) {
-        // FIXME
+        new android.app.AlertDialog.Builder(this).setTitle(null).setMessage(getString(stringId)).setPositiveButton(getString(R.string.btn_confirm), null).show();
     }
 }

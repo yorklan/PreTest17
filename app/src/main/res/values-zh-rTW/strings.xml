@@ -4,10 +4,11 @@
     <string name="detail_total_views">觀看次數</string>
     <string name="error_network">網路連線錯誤，請檢查手機網路是否正常練線，並稍後重試。</string>
     <string name="error_server">伺服器錯誤，請稍後再試。</string>
-    <string name="error_limited">您一小時內搜尋超過五千次，請稍後再試。</string>
+    <string name="error_limited">您的搜尋次數已達上限，請稍後再試。</string>
     <string name="error_update">無法更新資料。</string>
     <string name="error_retry">重試</string>
     <string name="no_result_empty">請輸入關鍵字搜尋</string>
     <string name="no_result_query">搜尋不到資料</string>
     <string name="hint_leave">再按一次退出</string>
+    <string name="btn_confirm">確認</string>
 </resources>

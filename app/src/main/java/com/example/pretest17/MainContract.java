@@ -28,6 +28,6 @@ public interface MainContract {
 
         void newSearchUsers(@NonNull String query);
 
-        void continueSearchUsers();
+        void updateSearchUsers(boolean isSearch);
     }
 }
