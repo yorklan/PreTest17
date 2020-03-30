@@ -44,8 +44,13 @@ public class UsersRepository implements UsersDataSource {
 
     @Override
     public void getUsers(@NonNull String query, int page, @NonNull Response.Listener<GithubData> onSuccessResponse, @NonNull Response.ErrorListener onErrorResponse) {
+        String lastSearch = "lastSearch";
+        mRequestQueue.cancelAll(lastSearch);
+
         String url = "https://api.github.com/search/users?q="+query+"&per_page=20&page="+page;
         GsonRequest gsonRequest = new GsonRequest<>(Request.Method.GET, url, GithubData.class, buildHeader(), null, onSuccessResponse, onErrorResponse);
+        gsonRequest.setTag(lastSearch);
+        gsonRequest.setShouldCache(false);
         mRequestQueue.add(gsonRequest);
     }
 

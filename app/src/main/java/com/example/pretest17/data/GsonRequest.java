@@ -1,7 +1,5 @@
 package com.example.pretest17.data;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -10,7 +8,6 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -61,24 +58,11 @@ public class GsonRequest<T> extends Request<T> {
             String json = new String(
                     response.data,
                     StandardCharsets.UTF_8);
-            Log.e("volley",json);
             return Response.success(
                     gson.fromJson(json, clazz),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (Exception e) {
             return Response.error(new ParseError(e));
         }
-    }
-
-    @Override
-    protected VolleyError parseNetworkError(VolleyError volleyError) {
-        try {
-            NetworkResponse networkResponse = volleyError.networkResponse;
-            String data = new String(networkResponse.data, StandardCharsets.UTF_8);
-            Log.e("volley_error",data);
-        } catch (Exception e) {
-            Log.e("volley_error_exception", e.toString());
-        }
-        return super.parseNetworkError(volleyError);
     }
 }

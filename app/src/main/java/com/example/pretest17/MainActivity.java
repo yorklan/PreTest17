@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import com.example.pretest17.data.UsersRepository;
 import com.example.pretest17.data.module.User;
@@ -17,6 +19,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     private MainContract.Presenter mMainPresenter;
     private UserCardAdapter mUserCardAdapter;
+
+    private boolean isLeave = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,5 +120,25 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public void showAlert(int stringId) {
         new android.app.AlertDialog.Builder(this).setTitle(null).setMessage(getString(stringId)).setPositiveButton(getString(R.string.btn_confirm), null).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isLeave = false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isLeave){
+            isLeave = false;
+            super.onBackPressed();
+        }else {
+            isLeave = true;
+            Toast toast = Toast.makeText(this, getString(R.string.hint_leave), Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.BOTTOM | Gravity.CENTER, 0, getResources().getDimensionPixelOffset(R.dimen.toast_height));
+            toast.show();
+        }
+
     }
 }

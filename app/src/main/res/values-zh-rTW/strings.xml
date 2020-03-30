@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LineTVDemo</string>
+    <string name="app_name">PreTest17</string>
     <string name="detail_create_at">出版日期</string>
     <string name="detail_total_views">觀看次數</string>
     <string name="error_network">網路連線錯誤，請檢查手機網路是否正常練線，並稍後重試。</string>

@@ -15,8 +15,6 @@ import com.example.pretest17.data.module.User;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-
 public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<User> mUserList = new ArrayList<>();
@@ -29,14 +27,15 @@ public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private class UserCardViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView imgAvatar, imgPlaceHolder;
+        private ImageView imgAvatar, imgPlaceHolder1, imgPlaceHolder2;
         private TextView textName;
 
         UserCardViewHolder(@NonNull View itemView) {
             super(itemView);
             imgAvatar = itemView.findViewById(R.id.img_card_user_avatar);
             textName = itemView.findViewById(R.id.text_card_user_name);
-            imgPlaceHolder = itemView.findViewById(R.id.img_card_user_placeholder);
+            imgPlaceHolder1 = itemView.findViewById(R.id.img_card_user_placeholder_1);
+            imgPlaceHolder2 = itemView.findViewById(R.id.img_card_user_placeholder_2);
         }
     }
 
@@ -111,15 +110,17 @@ public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (user != null) {
             Glide.with(holder.itemView.getContext())
                     .load(user.getAvatar())
-                    .transition(withCrossFade())
+                    .placeholder(R.drawable.shape_avatar)
                     .centerCrop()
                     .circleCrop()
                     .into(holder.imgAvatar);
             holder.textName.setText(user.getName());
             if (user.getCardType() == User.CARD_TYPE_3_3) {
-                holder.imgPlaceHolder.setVisibility(View.VISIBLE);
+                holder.imgPlaceHolder1.setVisibility(View.VISIBLE);
+                holder.imgPlaceHolder2.setVisibility(View.VISIBLE);
             } else {
-                holder.imgPlaceHolder.setVisibility(View.GONE);
+                holder.imgPlaceHolder1.setVisibility(View.GONE);
+                holder.imgPlaceHolder2.setVisibility(View.GONE);
             }
         }
     }
@@ -158,22 +159,28 @@ public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     void setStatusError(@NonNull String hint) {
         clearUserList();
         setStatus(VIEW_TYPE_ERROR, hint);
+        notifyDataSetChanged();
     }
 
     void setStatusNoResult(@NonNull String hint) {
         clearUserList();
         setStatus(VIEW_TYPE_NO_RESULT, hint);
+        notifyDataSetChanged();
     }
 
     void setStatusLoading() {
         clearUserList();
         setStatus(VIEW_TYPE_LOADING, "");
+        notifyDataSetChanged();
     }
 
     void updateStatusCards(@NonNull List<User> newUserList) {
+        int positionStart = getItemCount() - 1;
+        int size = newUserList.size();
         setUserViewType(newUserList);
         updateUserList(newUserList, -1);
         setStatus(VIEW_TYPE_CARDS, "");
+        notifyItemRangeChanged(positionStart, size);
     }
 
     void newStatusCards(@NonNull List<User> newUserList, int totalCount) {
@@ -181,6 +188,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         setUserViewType(newUserList);
         updateUserList(newUserList, totalCount);
         setStatus(VIEW_TYPE_CARDS, "");
+        notifyItemRangeChanged(0, newUserList.size());
     }
 
     private void setUserViewType(@NonNull List<User> userList) {
@@ -220,12 +228,11 @@ public class UserCardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private void setStatus(int status, @NonNull String hint) {
         this.status = status;
         this.hint = hint;
-        notifyDataSetChanged();
     }
 
     void forceStatusCardsEnd() {
         this.totalCount = mUserList.size();
-        notifyDataSetChanged();
+        notifyItemChanged(getItemCount()-1);
     }
 
     int getSpanCount(int position) {

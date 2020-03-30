@@ -13,22 +13,29 @@
     app:cardCornerRadius="@dimen/radius_medium">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_medium">
+
+        <ImageView
+            android:id="@+id/img_card_user_placeholder_1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="2:1"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@null" />
 
         <ImageView
             android:id="@+id/img_card_user_avatar"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="@dimen/margin_medium"
-            android:paddingBottom="@dimen/margin_medium"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@null"
-            tools:srcCompat="@tools:sample/avatars" />
+            app:layout_constraintTop_toBottomOf="@+id/img_card_user_placeholder_1"
+            android:contentDescription="@null"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
@@ -41,7 +48,7 @@
             android:id="@+id/text_card_user_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_small"
+            android:layout_marginStart="@dimen/margin_medium"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="2"
@@ -51,16 +58,14 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/img_card_user_placeholder"
+            android:id="@+id/img_card_user_placeholder_2"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="@dimen/margin_medium"
-            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintDimensionRatio="2:1"
             app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/img_card_user_avatar"
-            android:contentDescription="@null"
-            tools:srcCompat="@tools:sample/avatars" />
+            android:contentDescription="@null"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

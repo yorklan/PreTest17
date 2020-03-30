@@ -14,4 +14,5 @@ public interface UsersDataSource {
      * I just set Generic and use the interface that provided by Volley Library.
      */
     void getUsers(@NonNull String query, int page, @NonNull Response.Listener<GithubData> onSuccessResponse, @NonNull Response.ErrorListener onErrorResponse);
+
 }
